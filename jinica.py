@@ -56,8 +56,7 @@ for key in jinshi_pd_groupby.keys():
         year_ratio_dic[key] = jinshi_shizuzhi_pd_groupby[key] / jinshi_pd_groupby[key]
     else:
         year_ratio_dic[key] = 0
-   
-# visualization
+
 plt.figure(figsize=(20, 10))
 plt.plot(list(year_ratio_dic.keys()), list(year_ratio_dic.values()), color='blue', linewidth=2.0, linestyle='-')
 plt.xlabel('Year')
