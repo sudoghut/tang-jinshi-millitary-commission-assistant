@@ -1,6 +1,7 @@
 import pandas as pd
 import matplotlib.pyplot as plt
 import numpy as np
+from scipy.stats import ttest_ind
 
 jinshi_pd = pd.read_excel('input-tang-jinshi-raw.xlsx', sheet_name='Sheet1')
 jinshi_pd = jinshi_pd.dropna(subset=['Entry Year'])
@@ -104,6 +105,49 @@ plt.title('Shizupu Ratio of Jinshi and MCA')
 plt.legend()
 plt.show()
 
+# Calculate p-value for jinshi_year_ratio_dic and mca_year_ratio_dic
+jinshi_year_ratio_list = list(jinshi_year_ratio_dic.values())
+mca_year_ratio_list = list(mca_year_ratio_dic.values())
+print(ttest_ind(jinshi_year_ratio_list, mca_year_ratio_list))
+
+
+# calculate the difference of jinshi for each year (yearn - year(n-1))
+jinshi_diff_dic = {}
+for key in jinshi_year_ratio_dic.keys():
+    if key == 0: continue
+    if key - group_num not in jinshi_year_ratio_dic.keys(): continue
+    jinshi_diff_dic[key] = jinshi_year_ratio_dic[key] - jinshi_year_ratio_dic[key - group_num]
+
+# calculate the difference of mca for each year (yearn - year(n-1))
+mca_diff_dic = {}
+for key in mca_year_ratio_dic.keys():
+    if key == 0: continue
+    if key - group_num not in mca_year_ratio_dic.keys(): continue
+    mca_diff_dic[key] = mca_year_ratio_dic[key] - mca_year_ratio_dic[key - group_num]
+
+# Create empty lists to store the differences and years
+jinshi_diff_list = []
+mca_diff_list = []
+year_list = []
+
+# Iterate over the keys in jinshi_diff_dic and mca_diff_dic
+for year in jinshi_diff_dic.keys():
+    # Check if the year is in both dictionaries
+    if year in mca_diff_dic:
+        # Append the differences and year to the lists
+        jinshi_diff_list.append(jinshi_diff_dic[year])
+        mca_diff_list.append(mca_diff_dic[year])
+        year_list.append(year)
+
+# Calculate the p-value of the difference between jinshi_diff_list and mca_diff_list
+t_stat, p_val = ttest_ind(jinshi_diff_list, mca_diff_list)
+
+print(jinshi_diff_list)
+print(mca_diff_list)
+
+# Print the p-value
+print(f"The p-value of the difference between Jinshi and MCA is: {p_val}")
+
 # Draw regression line
 plt.plot(list(jinshi_year_ratio_dic.keys()), list(jinshi_year_ratio_dic.values()), 'o', label='jinshi')
 plt.plot(list(mca_year_ratio_dic.keys()), list(mca_year_ratio_dic.values()), 'o', label='mca')
@@ -126,6 +170,9 @@ plt.title('Shizupu Ratio of Jinshi and MCA')
 
 plt.legend()
 plt.show()
+
+
+
 
 
 
